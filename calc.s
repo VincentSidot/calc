@@ -394,6 +394,7 @@ tokenize:
         cmp rax, 47
         jg .junkown
         sub rax, 42
+        jc .junkown; Invalid operator less than 42
         jmp QWORD [.jtable + rax * 8]; Jump to the operator
         ; rax*8 is the index of the operator in the table qword
         .jtable: ; Table of operators (42-47)
