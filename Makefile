@@ -21,4 +21,7 @@ run: build
 debug: build
 	@./fdbg/fdbg $(BUILD_DIR)/calc
 
+# Shortcuts
+dbg: debug
+
 .PHONY: dir clean build run debug
