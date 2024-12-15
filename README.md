@@ -1,6 +1,6 @@
 # Reverse Polish Notation (RPN) Calculator in Assembly
 
-This project implements a Reverse Polish Notation (RPN) calculator in x86-64 assembly language using the **flat assembler (FASM)**. The calculator supports basic arithmetic operations and is designed as a command-line utility, reading input from standard input (stdin) and outputting results to standard output (stdout). The project showcases low-level programming techniques, including stack manipulation, string parsing, and dynamic memory management in assembly.
+This project implements a Reverse Polish Notation (RPN) calculator in x86-64 assembly language using the **flat assembler (FASM)**. The calculator supports basic arithmetic operations and is designed as a command-line utility, reading input from standard input (stdin) and outputting results to standard output (stdout). The project showcases low-level programming techniques, including stack manipulation, string parsing, and static memory management in assembly.
 
 ## Features
 
@@ -25,8 +25,6 @@ This project implements a Reverse Polish Notation (RPN) calculator in x86-64 ass
 ### Current Limitations
 - **Parenthesis Handling**: The current implementation does not support expressions with parenthesis, such as `((1 + 2) * 3)`.
 - **Floating-Point Operations**: Operations on floating-point numbers are not supported; only integers are handled.
-- **Advanced Mathematical Functions**: The calculator does not support advanced mathematical functions like power, modulus,
-    or trigonometric functions.
 
 ## Structure
 
