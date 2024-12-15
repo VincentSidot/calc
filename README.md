@@ -25,6 +25,7 @@ This project implements a Reverse Polish Notation (RPN) calculator in x86-64 ass
 ### Current Limitations
 - **Parenthesis Handling**: The current implementation does not support expressions with parenthesis, such as `((1 + 2) * 3)`.
 - **Floating-Point Operations**: Operations on floating-point numbers are not supported; only integers are handled.
+- **Negative Numbers**: Negative numbers are not supported in the current implementation.
 
 ## Structure
 
@@ -81,16 +82,22 @@ Goodbye!
    - Implement functionality to parse and evaluate expressions with parenthesis for grouping operations.
    - Adjust the tokenization and operator precedence logic to account for parenthesis.
 
-2. **Floating-Point Operations**:
+2. **Negative Numbers**:
+   - Add support for negative numbers in the input expressions.
+   - Update the tokenization and parsing logic to handle negative numbers correctly.
+   - Update `putd` procedure to handle negative integers.
+
+3. **Floating-Point Operations**:
    - Extend the calculator to support floating-point numbers.
    - Use x87 FPU instructions or SIMD registers (e.g., SSE or AVX).
 
-3. **Additional Features**:
+4. **Additional Features**:
    - Add support for more advanced mathematical functions (e.g., power, modulus).
    - Enhance error reporting to include more detailed descriptions of input errors.
 
-4. **Operation Availability**:
+5. **Operation Availability**:
    - Expand the range of operations supported by the calculator, including bitwise operations, logical operations, and more advanced mathematical functions.
+
 
 ## Contributions
 Contributions to improve the project are welcome. Feel free to open issues or submit pull requests.
