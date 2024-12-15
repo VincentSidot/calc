@@ -233,6 +233,8 @@ op_mul:
     op_setup_ret
 op_div:
     op_setup_pop
+    cmp rbx, 0; Check for division by zero
+    je zero_division
     xor rdx, rdx; Clear rdx
     div rbx; Divide the operands
     op_setup_ret
@@ -459,6 +461,11 @@ tokenize:
 stop:
     sprint t_goodbye
     exit 0
+zero_division:
+    mov rsp, r14 ; Reset the stack
+    add rsp, 8; Remove the return address
+    sprint t_zeroDivision
+    jmp start
 scall_overflow:
     mov rsp, r14 ; Reset the stack
     add rsp, 8; Remove the return address
@@ -524,6 +531,7 @@ sstr t_noInput, "No input provided", 10
 sstr t_unknownToken, COLOR_RED, "Unknown token", COLOR_RESET, 10
 sstr t_badInput, COLOR_RED, "Bad input", COLOR_RESET, 10
 sstr t_scallOverflow, COLOR_RED, "Operation stack overflow", COLOR_RESET, 10
+sstr t_zeroDivision, COLOR_RED, "Division by zero", COLOR_RESET, 10
 
 sstr t_newline, COLOR_RESET, 10
 
