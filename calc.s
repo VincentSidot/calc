@@ -107,6 +107,7 @@ macro exit code {
 ;  This macro sets the zero flag if the strings are equal
 ;  The strings must be null-terminated
 macro strcmp str1, str2 {
+    local .loop, .end
     mov rcx, str1
     mov rdx, str2
     .loop:
@@ -346,21 +347,43 @@ extract_token:
     .end:
     ret
 
-; Pop tokens stack to stack
+; Pop all tokens with a higher or equal precedence
+; r13b hold the precedence of the current operator
 pop_tokens:
     pop rax; Save return address in rax
     ; r15 hold the operation stack size
+    cmp r15, 0
+    ; Get the precedence of the current operator
+    mov r12b, [OPERATION_PRECEDENCE_TABLE + r13]
+    je .end
     .jpop:
         xor r11, r11; Clear r11
         dec r15
         mov r11b, [op + r15]; Get the token type
+
+        cmp r13b, [OP_RPAR_KIND]; If the current operator is a right parenthesis
+        ; We skip the precedence check until we find the left parenthesis
+            je .skip_check 
+            
+        ; Get the precedence of the operator in the stack
+        mov r10b, [OPERATION_PRECEDENCE_TABLE + r11]
+        cmp r10b, r12b; Check if the precedence is higher
+            jl .restore; If less, stop popping
+    .skip_check:
+        ; Do not pop the parenthesis
+        cmp r11b, [OP_LPAR_KIND]
+            jge .end
         push QWORD [OPERATION_TABLE + 8 * r11]
         push TOKEN_TYPE_OPERATOR
     cmp r15, 0
-    jg .jpop
-    
-    push rax; Push the return address
-    ret ; Should not segfault (hopefully)
+    jne .jpop
+    .end:
+        push rax; Push the return address
+        ret ; Should not segfault (hopefully)
+    .restore:
+        ; Restore the last operator
+        inc r15
+        jmp .end
 
 tokenize:
     ; r15 hold the operation stack size
@@ -391,15 +414,19 @@ tokenize:
         cmp rax, 1
         jne bad_input
 
+        xor r13, r13; Clear r13
+
         ; Check if the token is an operator
         movzx rax, BYTE [token]
         cmp rax, 47
         jg .junkown
-        sub rax, 42
-        jc .junkown; Invalid operator less than 42
+        sub rax, 40
+        jc .junkown; Invalid operator less than 40
         jmp QWORD [.jtable + rax * 8]; Jump to the operator
         ; rax*8 is the index of the operator in the table qword
         .jtable: ; Table of operators (42-47)
+            dq .jlpar; 40
+            dq .jrpar; 41
             dq .jmul; 42
             dq .jadd; 43
             dq .junkown; 44
@@ -407,6 +434,16 @@ tokenize:
             dq .junkown; 46
             dq .jdiv; 47
 
+        .jlpar:
+        ; Push the left parenthesis to the stack
+            mov r13b, [OP_LPAR_KIND]
+            jmp .jend
+        .jrpar:
+            mov r13b, [OP_RPAR_KIND]
+            cmp r15, 0
+            je bad_input
+            call pop_tokens
+            jmp .trailing_iter
         .jadd:
             mov r13b, [OP_ADD_KIND]
             jmp .jcheckpop
@@ -425,15 +462,11 @@ tokenize:
             ; Check if op stack is empty
             cmp r15, 0
             je .jend ; No operator just push
-            movzx r11, BYTE [op + r15 - 1]; Get the last operator
-            movzx r12, BYTE [OP_SUB_KIND]
-            cmp r11, r12
-            jl .jend
             ; We need to pop all the operatos in the stack
             call pop_tokens
         .jend:
+            mov [op + r15], r13b; Push the operator to the stack
             inc r15
-            mov [op + r15 - 1], r13b
             
     .trailing_iter:
         ; Check if we reached the end of the buffer
@@ -446,6 +479,7 @@ tokenize:
         jmp .iter
     .stop_iter:
         ; Push trailing operators to the stack
+        mov r13b, 0; We want to pop all the operators
         call pop_tokens
         ; We can make the calculation. We will use r15 as the value holder
         pop rax ; Get the first token
@@ -543,6 +577,16 @@ OP_ADD_KIND db 0
 OP_SUB_KIND db 1
 OP_MUL_KIND db 2
 OP_DIV_KIND db 3
+OP_LPAR_KIND db 4
+OP_RPAR_KIND db 5
+
+OPERATION_PRECEDENCE_TABLE:
+    db 1 ; ADD
+    db 1 ; SUB
+    db 2 ; MUL
+    db 2 ; DIV
+    db 0 ; LPAR
+    db 3 ; RPAR
 
 ; Operation table
 OPERATION_TABLE:

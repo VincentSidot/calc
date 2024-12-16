@@ -23,7 +23,6 @@ This project implements a Reverse Polish Notation (RPN) calculator in x86-64 ass
   - Detection of bad or missing input
 
 ### Current Limitations
-- **Parenthesis Handling**: The current implementation does not support expressions with parenthesis, such as `((1 + 2) * 3)`.
 - **Floating-Point Operations**: Operations on floating-point numbers are not supported; only integers are handled.
 - **Negative Numbers**: Negative numbers are not supported in the current implementation.
 
@@ -75,12 +74,12 @@ Goodbye!
 - **"Unknown token"**: Indicates that the input contained an unrecognized symbol.
 - **"Bad input"**: Indicates that the input format is invalid.
 - **"Operation stack overflow"**: Indicates that too many operations were stacked.
+- **"Division by zero"**: Indicates that a division operation was attempted with a divisor of zero.
 
 ## TODO / Next Steps
 
-1. **Parenthesis Handling**:
-   - Implement functionality to parse and evaluate expressions with parenthesis for grouping operations.
-   - Adjust the tokenization and operator precedence logic to account for parenthesis.
+1. **Unbalanced Parentheses**:
+   - Handle error cases where the input expression contains unbalanced parentheses.
 
 2. **Negative Numbers**:
    - Add support for negative numbers in the input expressions.
